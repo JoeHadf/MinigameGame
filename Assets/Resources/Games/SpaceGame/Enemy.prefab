@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 5185453679955202673}
   m_Layer: 0
   m_Name: Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -99,7 +99,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   bullet: {fileID: 2928962671566148094, guid: 4d45d0152996b5e4e95d8cd908fb97c5, type: 3}
-  speed: 5
+  speed:
+    baseSpeed: 5
+  totalShots: 3
+  shotDelay:
+    baseTime: 0.5
   playerObject: {fileID: 0}
 --- !u!50 &5185453679955202673
 Rigidbody2D:

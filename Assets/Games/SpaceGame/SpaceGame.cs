@@ -5,51 +5,50 @@ using UnityEngine;
 
 public class SpaceGame : Game
 {
-    private GameObject rocket;
-    private GameObject enemy1;
-    
-    public SpaceGame(GameObject parent) : base(GameType.Boss, GameName.SpaceGame, parent)
-    {
-        
-    }
+    private RocketController rocketController;
+    public SpaceGame() : base(GameName.SpaceGame) { }
 
-    public override void SetUpGame()
+    protected override void SetUpEasy()
     {
-        Vector2 bounds = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
-        float minX = -bounds.x;
-        float maxX = bounds.x;
-        float minY = -bounds.y;
-        float maxY = bounds.y;
+        Vector3 rocketPos = ScreenSpaceCalculator.ScreenSpaceToWorldSpace(0, -0.5f);
+        Vector3 enemyPos = ScreenSpaceCalculator.ScreenSpaceToWorldSpace(0.5f, 0.5f);
 
-        Vector3 rocketPos = new Vector3(0, minY / 2, 0);
-        Vector3 enemy1Pos = new Vector3(minX / 2, maxY / 2, 0);
-        Vector3 enemy2Pos = new Vector3(maxX / 2, maxY / 2, 0);
+        ObjectSpawner objectSpawner = ObjectSpawner.Instance;
         
         GameObject rocketPrefab = Resources.Load("Games/SpaceGame/Rocket", typeof(GameObject)) as GameObject;
-        rocket = Object.Instantiate(rocketPrefab, rocketPos, Quaternion.identity, objectsParent.transform);
+        GameObject rocket = objectSpawner.Spawn(rocketPrefab, rocketPos);
+
+        rocketController = rocket.GetComponent<RocketController>();
             
         GameObject enemyPrefab = Resources.Load("Games/SpaceGame/Enemy", typeof(GameObject)) as GameObject;
-        
-        enemy1 = Object.Instantiate(enemyPrefab, enemy1Pos, Quaternion.identity, objectsParent.transform);
+        GameObject enemy = objectSpawner.Spawn(enemyPrefab, enemyPos);
 
-        EnemyBehaviour enemy1Behaviour = enemy1.GetComponent<EnemyBehaviour>();
+        EnemyBehaviour enemy1Behaviour = enemy.GetComponent<EnemyBehaviour>();
         enemy1Behaviour.playerObject = rocket;
         
         GameObject cometPrefab = Resources.Load("Games/SpaceGame/Comet", typeof(GameObject)) as GameObject;
         
-        Object.Instantiate(cometPrefab, Vector3.zero, Quaternion.identity, objectsParent.transform);
-        Object.Instantiate(cometPrefab, Vector3.zero, Quaternion.identity, objectsParent.transform);
+        objectSpawner.Spawn(cometPrefab, Vector3.zero);
+        objectSpawner.Spawn(cometPrefab, Vector3.zero);
     }
 
-    public override GameSuccessState GetSuccessState()
+    protected override void SetUpMedium()
     {
-        RocketHitDetection hitDetection = rocket.GetComponent<RocketHitDetection>();
+        SetUpEasy();
+    }
 
-        if (hitDetection.hasBeenHit)
+    protected override void SetUpHard()
+    {
+        SetUpEasy();
+    }
+
+    public override bool IsSuccess()
+    {
+        if (rocketController.isHit)
         {
-            return GameSuccessState.Failure;
+            return false;
         }
 
-        return GameSuccessState.Success;
+        return true;
     }
 }

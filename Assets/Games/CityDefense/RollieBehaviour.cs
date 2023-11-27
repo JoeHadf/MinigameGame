@@ -6,7 +6,7 @@ using UnityEngine;
 
 public class RollieBehaviour : MonoBehaviour
 {
-    private const float speed = 5.0f;
+    [SerializeField] private EntitySpeed entitySpeed;
 
     private float directionCoefficient = 1;
 
@@ -16,7 +16,7 @@ public class RollieBehaviour : MonoBehaviour
     }
     void Update()
     {
-        float distance = Time.deltaTime * speed * directionCoefficient;
+        float distance = Time.deltaTime * entitySpeed * directionCoefficient;
         transform.position += distance * Vector3.right;
     }
 

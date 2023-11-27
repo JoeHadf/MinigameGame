@@ -6,46 +6,42 @@ namespace Games
 {
     public abstract class Game
     {
-        public GameType gameType;
+        public GameData data { get; private set; }
 
-        public GameName gameName;
+        protected ObjectSpawner objectSpawner;
 
-        public GameObject objectsParent;
-    
-        public Game(GameType type, GameName name, GameObject parent)
+        protected Game(GameName name)
         {
-            gameType = type;
-            gameName = name;
-            objectsParent = parent;
+            this.data = GameInformation.GetGameData(name);
+            objectSpawner = ObjectSpawner.Instance;
         }
-    
-        public abstract void SetUpGame();
 
-        public abstract GameSuccessState GetSuccessState();
-
-        public void CleanUpGame()
+        public void SetUpGame()
         {
-            foreach (Transform child in objectsParent.transform)
+            switch (GameLevel.level)
             {
-                GameObject.Destroy(child.gameObject);
+                case GameLevel.Level.Easy:
+                    SetUpEasy();
+                    break;
+                case GameLevel.Level.Medium:
+                    SetUpMedium();
+                    break;
+                case GameLevel.Level.Hard:
+                    SetUpHard();
+                    break;
+                default:
+                    Debug.Log("Unknown game level to set up");
+                    SetUpEasy();
+                    break;
             }
         }
-    }
 
-    public enum GameType
-    {
-        Null = 0,
-        Regular = 1,
-        Boss = 2
-    }
+        protected abstract void SetUpEasy();
 
-    public enum GameName
-    {
-        Null = 0,
-        SquareTheCircle = 1,
-        CatchTheDroplet = 2,
-        Sudoku = 3,
-        SpaceGame = 101,
-        CityDefense = 102
+        protected abstract void SetUpMedium();
+
+        protected abstract void SetUpHard();
+
+        public abstract bool IsSuccess();
     }
 }

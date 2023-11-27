@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 3141541503493398562}
   m_Layer: 0
   m_Name: Comet
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -163,3 +163,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   hazardSprite: {fileID: 21300000, guid: 822b0980c11f17a40936d75fc22366a3, type: 3}
   cometSprite: {fileID: 21300000, guid: 81c65ed3e0c67ff4682156d67647c9cc, type: 3}
+  warningTime:
+    baseTime: 3
+  fallingTime:
+    baseTime: 5
+  fallingSpeed:
+    baseSpeed: 10

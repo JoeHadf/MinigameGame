@@ -1,84 +1,58 @@
 using System.Collections;
 using System.Collections.Generic;
 using Microsoft.Win32.SafeHandles;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Experimental.GlobalIllumination;
 
-public class CometBehaviour : MonoBehaviour
+public class CometBehaviour : PhasedEntity
 {
     [SerializeField] private Sprite hazardSprite;
     [SerializeField] private Sprite cometSprite;
+    [SerializeField] private EntityTime warningTime;
+    [SerializeField] private EntityTime fallingTime;
+    [SerializeField] private EntitySpeed fallingSpeed;
 
     private SpriteRenderer spriteRenderer;
-
-    private float minX;
-    private float maxX;
-    private float yValue;
-
-    private CometMovingState currentState;
-
-    private float timer;
-    private const float warningTime = 3;
-    private const float fallingTime = 5;
-    private const float fallingSpeed = 10;
     
-    
-    void Awake()
+    private protected override void OnAwake()
     {
-        Vector2 Bounds = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
-        minX = -Bounds.x;
-        maxX = Bounds.x;
-        yValue = Bounds.y * 2/3;
-
-        timer = warningTime;
-        currentState = CometMovingState.Warning;
-
-        transform.position = ChooseNewPosition();
-
         spriteRenderer = gameObject.GetComponent<SpriteRenderer>();
-        spriteRenderer.sprite = hazardSprite;
     }
 
     void Start()
     {
-        gameObject.tag = "Enemy";
+        PhaseCondition warningDelay = new TimeCondition(this, warningTime.GetTime());
+        Phase warningPhase = new Phase(StartWarningPhase, () => {}, warningDelay);
+
+        PhaseCondition fallingDelay = new TimeCondition(this, fallingTime.GetTime());
+        Phase fallingPhase = new Phase(StartFallingPhase, MoveComet, fallingDelay);
+
+        Phase[] cometPhases = new Phase[] { warningPhase, fallingPhase };
+        
+        SetUpPhases(cometPhases);
     }
 
-    void Update()
+    private void StartWarningPhase()
     {
-        timer -= Time.deltaTime;
+        spriteRenderer.sprite = hazardSprite;
+        transform.position = ChooseNewPosition();
+    }
 
-        if (currentState == CometMovingState.Warning)
-        {
-            if (timer < 0)
-            {
-                timer = fallingTime;
-                currentState = CometMovingState.Falling;
-                spriteRenderer.sprite = cometSprite;
+    private void StartFallingPhase()
+    {
+        spriteRenderer.sprite = cometSprite;
+        transform.position += new Vector3(0, 2, 0);
+    }
 
-            }
-        }
-        else if (currentState == CometMovingState.Falling)
-        {
-            transform.position += Vector3.down * (fallingSpeed * Time.deltaTime);
-            if (timer < 0)
-            {
-                timer = warningTime;
-                currentState = CometMovingState.Warning;
-                spriteRenderer.sprite = hazardSprite;
-                transform.position = ChooseNewPosition();
-            }
-        }
+    private void MoveComet()
+    {
+        transform.position += Vector3.down * (fallingSpeed * Time.deltaTime);
     }
 
     private Vector3 ChooseNewPosition()
     {
-        float x = Random.Range(minX, maxX);
-        return new Vector3(x, yValue, 0);
-    }
-    private enum CometMovingState
-    {
-        Null = 0,
-        Falling = 1,
-        Warning = 2
+        float x = Random.Range(-1.0f, 1.0f);
+        return ScreenSpaceCalculator.ScreenSpaceToWorldSpace(x, 2.0f / 3.0f);
     }
 }

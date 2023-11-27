@@ -5,45 +5,46 @@ using UnityEngine;
 
 public class CatchTheDroplet : Game
 {
-    private GameObject droplet;
-    private GameObject bucket;
-
-    private const float dropletHeight = 3;
-    private const float bucketHeight = -3;
+    private DropletBehaviour dropletBehaviour;
     
-    public CatchTheDroplet(GameObject parent) : base(GameType.Regular, GameName.CatchTheDroplet, parent)
-    {
-        
-    }
+    public CatchTheDroplet() : base(GameName.CatchTheDroplet) { }
 
-    public override void SetUpGame()
+    protected override void SetUpEasy()
     {
-        Vector2 Bounds = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
-        float minX = -Bounds.x;
-        float maxX = Bounds.x;
-        
-        float dropletX = Random.Range(minX, maxX);
-        Vector3 dropletPos = new Vector3(dropletX, dropletHeight, 0);
+        float dropletX = Random.Range(-1.0f, 1.0f);
+        Vector3 dropletPos = ScreenSpaceCalculator.ScreenSpaceToWorldSpace(dropletX, 1);
             
-        float bucketX = Random.Range(minX, maxX);
-        Vector3 bucketPos = new Vector3(bucketX, bucketHeight, 0);
+        float bucketX = Random.Range(-1.0f, 1.0f);
+        Vector3 bucketPos = ScreenSpaceCalculator.ScreenSpaceToWorldSpace(bucketX, -0.75f);
+        
+        ObjectSpawner objectSpawner = ObjectSpawner.Instance;
         
         GameObject dropletPrefab = Resources.Load("Games/CatchTheDroplet/Droplet", typeof(GameObject)) as GameObject;
-        droplet = GameObject.Instantiate(dropletPrefab, dropletPos, Quaternion.identity, objectsParent.transform);
+        GameObject droplet = objectSpawner.Spawn(dropletPrefab, dropletPos);
+        dropletBehaviour = droplet.GetComponent<DropletBehaviour>();
             
         GameObject bucketPrefab = Resources.Load("Games/CatchTheDroplet/Bucket", typeof(GameObject)) as GameObject;
-        bucket = GameObject.Instantiate(bucketPrefab, bucketPos, Quaternion.identity, objectsParent.transform);
+        objectSpawner.Spawn(bucketPrefab, bucketPos);
     }
 
-    public override GameSuccessState GetSuccessState()
+    protected override void SetUpMedium()
     {
-        DropletMovement dropletMovement = droplet.GetComponent<DropletMovement>();
+        SetUpEasy();
+    }
 
-        if (dropletMovement.successfulCatch)
+    protected override void SetUpHard()
+    {
+        SetUpEasy();
+    }
+
+
+    public override bool IsSuccess()
+    {
+        if (dropletBehaviour.successfulCatch)
         {
-            return GameSuccessState.Success;
+            return true;
         }
 
-        return GameSuccessState.Failure;
+        return false;
     }
 }

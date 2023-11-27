@@ -1,103 +1,82 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
-public class EnemyBehaviour : MonoBehaviour
+public class EnemyBehaviour : PhasedEntity
 {
     [SerializeField] private GameObject bullet;
-    [SerializeField] private float speed;
-
+    [SerializeField] private EntitySpeed speed;
+    [SerializeField] private int totalShots;
+    [SerializeField] private EntityTime shotDelay;
+    
     public GameObject playerObject;
 
-    private EnemyMovingState currentState;
+    private Vector3 startingPosition;
+    private Vector3 movingDirection;
+    private float sqrDistanceToMove;
 
-    private Vector3 movingToPosition;
-    private int currentShotCount;
-
-    private const int totalShots = 3;
-    private const float shotDelay = 0.5f;
-
-    private float timer;
-    
-    private float minX;
-    private float maxX;
-    private float minY;
-    private float maxY;
-
-    void Awake()
+    void Start()
     {
-        Vector2 Bounds = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
-        minX = -Bounds.x;
-        maxX = Bounds.x;
-        minY = 0;
-        maxY = Bounds.y;
+        PhaseCondition hasMovedToPosition = new GoalCondition(HasMovedToPosition);
+        Phase movingPhase = new Phase(ChooseNewPosition, MoveTowardsPosition, hasMovedToPosition);
 
-        movingToPosition = ChooseNewPosition();
-        currentState = EnemyMovingState.Moving;
+        PhaseCondition shootDelay = new TimeCondition(this, shotDelay.GetTime());
+        Phase shootingPhase = new Phase(ShootBullet, () => { }, shootDelay);
 
-    }
-    void Update()
-    {
-        timer -= Time.deltaTime;
+        int phaseCount = 1 + totalShots;
+
+        Phase[] enemyPhases = new Phase[phaseCount];
+
+        enemyPhases[0] = movingPhase;
+        for (int i = 1; i < phaseCount; i++)
+        {
+            enemyPhases[i] = shootingPhase;
+        }
         
-        if (currentState == EnemyMovingState.Moving)
-        {
-            Vector3 movementDirection = movingToPosition - transform.position;
-            movementDirection.Normalize();
-            transform.position += movementDirection * (speed * Time.deltaTime);
-
-            if (timer < 0)
-            {
-                currentState = EnemyMovingState.Shooting;
-                timer = shotDelay;
-            }
-
-        }
-        else if (currentState == EnemyMovingState.Shooting)
-        {
-            if (timer < 0)
-            {
-                GameObject currentBullet = Instantiate(bullet, transform.position, Quaternion.identity, transform.parent);
-                Destroy(currentBullet, 5);
-                BulletBehaviour behaviour = currentBullet.GetComponent<BulletBehaviour>();
-                Vector3 playerLocation = (playerObject == null) ? transform.position : playerObject.transform.position;
-                Vector3 direction = playerLocation - transform.position;
-                direction.Normalize();
-                behaviour.direction = (direction == Vector3.zero) ? Vector3.down : direction;
-                
-                currentShotCount++;
-
-                if (currentShotCount > totalShots)
-                {
-                    currentShotCount = 0;
-                    currentState = EnemyMovingState.Moving;
-
-                    movingToPosition = ChooseNewPosition();
-                    float distanceToNewPosition = (transform.position - movingToPosition).magnitude;
-                    float timeToNewPosition = distanceToNewPosition / speed;
-                    timer = timeToNewPosition;
-                }
-                else
-                {
-                    timer = shotDelay;
-                }
-            }
-        }
+        SetUpPhases(enemyPhases);
+    }
+    
+    private void ChooseNewPosition()
+    {
+        startingPosition = transform.position;
+        
+        float x = Random.Range(-1.0f, 1.0f);
+        float y = Random.Range(0.0f, 1.0f);
+        Vector3 movingToPosition = ScreenSpaceCalculator.ScreenSpaceToWorldSpace(x, y);
+        
+        movingDirection = movingToPosition - startingPosition;
+        sqrDistanceToMove = movingDirection.sqrMagnitude;
+        movingDirection.Normalize();
     }
 
-    private Vector3 ChooseNewPosition()
+    private void MoveTowardsPosition()
     {
-        float x = Random.Range(minX, maxX);
-        float y = Random.Range(minY, maxY);
-
-        return new Vector3(x, y, 0);
-
+        transform.position += movingDirection * (speed * Time.deltaTime);
     }
 
-    private enum EnemyMovingState
+    private bool HasMovedToPosition()
     {
-        Null = 0,
-        Moving = 1,
-        Shooting = 2
+        Vector3 currentPosition = transform.position;
+        float sqrDistanceToStart = (currentPosition - startingPosition).sqrMagnitude;
+
+        if (sqrDistanceToStart >= sqrDistanceToMove)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private void ShootBullet()
+    {
+        GameObject currentBullet = Instantiate(bullet, transform.position, Quaternion.identity, transform.parent);
+        Destroy(currentBullet, 5);
+        BulletBehaviour behaviour = currentBullet.GetComponent<BulletBehaviour>();
+        Vector3 playerLocation = (playerObject == null) ? transform.position : playerObject.transform.position;
+        Vector3 direction = playerLocation - transform.position;
+        direction.Normalize();
+        behaviour.direction = (direction == Vector3.zero) ? Vector3.down : direction;
     }
 }

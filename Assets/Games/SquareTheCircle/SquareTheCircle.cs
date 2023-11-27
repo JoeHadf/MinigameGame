@@ -5,50 +5,80 @@ namespace Games
 {
     public class SquareTheCircle : Game
     {
-        private GameObject circle;
-        private GameObject square;
+        private GameObject circlePrefab;
+        private GameObject squarePrefab;
         
-        public SquareTheCircle(GameObject parent) : base(GameType.Regular, GameName.SquareTheCircle, parent)
+        private SquareBehaviour[] squareBehaviours;
+
+        public SquareTheCircle() : base(GameName.SquareTheCircle)
         {
-        
+            circlePrefab = Resources.Load("Games/SquareTheCircle/Circle", typeof(GameObject)) as GameObject;
+            squarePrefab = Resources.Load("Games/SquareTheCircle/Square", typeof(GameObject)) as GameObject;
         }
 
-        public override void SetUpGame()
+        protected override void SetUpEasy()
         {
-            Vector2 Bounds = Camera.main.ScreenToWorldPoint(new Vector2(Screen.width, Screen.height));
-            float minX = -Bounds.x;
-            float maxX = Bounds.x;
-            float minY = -Bounds.y;
-            float maxY = Bounds.y;
-
-            float circleX = Random.Range(minX, maxX);
-            float circleY = Random.Range(minY, maxY);
-            Vector3 circlePos = new Vector3(circleX, circleY, 0);
-            
-;           float squareX = Random.Range(minX, maxX);
-            float squareY = Random.Range(minY, maxY);
-            Vector3 squarePos = new Vector3(squareX, squareY, 0);
-            
-            GameObject circlePrefab = Resources.Load("Games/SquareTheCircle/Circle", typeof(GameObject)) as GameObject;
-            circle = GameObject.Instantiate(circlePrefab, circlePos, Quaternion.identity, objectsParent.transform);
-            
-            GameObject squarePrefab = Resources.Load("Games/SquareTheCircle/Square", typeof(GameObject)) as GameObject;
-            square = GameObject.Instantiate(squarePrefab, squarePos, Quaternion.identity, objectsParent.transform);
+            int squareCount = 1;
+            SpawnObjects(squareCount,out SquareBehaviour[] behaviours);
+            squareBehaviours = behaviours;
         }
 
-        public override GameSuccessState GetSuccessState()
+        protected override void SetUpMedium()
         {
-            Collider2D circleCollider = circle.GetComponent<Collider2D>();
-            Collider2D squareCollider = square.GetComponent<Collider2D>();
+            int squareCount = 2;
+            SpawnObjects(squareCount,out SquareBehaviour[] behaviours);
+            squareBehaviours = behaviours;
+        }
 
-            if (circleCollider.IsTouching(squareCollider))
+        protected override void SetUpHard()
+        {
+            int squareCount = 3;
+            SpawnObjects(squareCount,out SquareBehaviour[] behaviours);
+            squareBehaviours = behaviours;
+        }
+
+        private void SpawnObjects(int squareCount, out SquareBehaviour[] behaviours)
+        {
+            SpawnCircle();
+            behaviours = SpawnSquares(squareCount);
+        }
+
+        private void SpawnCircle()
+        {
+            Vector3 circlePos = ScreenSpaceCalculator.GetRandomPosition();
+            objectSpawner.Spawn(circlePrefab, circlePos);
+        }
+
+        private SquareBehaviour[] SpawnSquares(int squareCount)
+        {
+            SquareBehaviour[] behaviours = new SquareBehaviour[squareCount];
+
+            for (int i = 0; i < squareCount; i++)
             {
-                return GameSuccessState.Success;
+                behaviours[i] = SpawnSquare();
             }
-            else
+
+            return behaviours;
+        }
+
+        private SquareBehaviour SpawnSquare()
+        {
+            Vector3 squarePos = ScreenSpaceCalculator.GetRandomPosition();
+            GameObject square = objectSpawner.Spawn(squarePrefab, squarePos);
+            return square.GetComponent<SquareBehaviour>();
+        } 
+
+        public override bool IsSuccess()
+        {
+            foreach (var currentBehaviour in squareBehaviours)
             {
-                return GameSuccessState.Failure;
+                if (!currentBehaviour.isHit)
+                {
+                    return false;
+                }
             }
+
+            return true;
         }
     }
 }

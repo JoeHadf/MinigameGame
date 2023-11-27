@@ -5,28 +5,38 @@ using UnityEngine;
 
 public class CityDefense : Game
 {
-    private GameObject city;
-    public CityDefense(GameObject parent) : base(GameType.Boss, GameName.CityDefense, parent)
-    {
-    }
+    private CityBehaviour cityBehaviour;
+    
+    public CityDefense() : base(GameName.CityDefense) { }
 
-    public override void SetUpGame()
+    protected override void SetUpEasy()
     {
+        ObjectSpawner objectSpawner = ObjectSpawner.Instance;
         GameObject swordsmanPrefab = Resources.Load("Games/CityDefense/Swordsman", typeof(GameObject)) as GameObject;
-        Object.Instantiate(swordsmanPrefab, Vector3.zero, Quaternion.identity, objectsParent.transform);
+        objectSpawner.Spawn(swordsmanPrefab, Vector3.zero);
         
         GameObject cityPrefab = Resources.Load("Games/CityDefense/City", typeof(GameObject)) as GameObject;
-        city = Object.Instantiate(cityPrefab, Vector3.zero, Quaternion.identity, objectsParent.transform);
+        GameObject city = objectSpawner.Spawn(cityPrefab, Vector3.zero);
+        cityBehaviour = city.GetComponent<CityBehaviour>();
     }
 
-    public override GameSuccessState GetSuccessState()
+    protected override void SetUpMedium()
     {
-        CityBehaviour cityBehaviour = city.GetComponent<CityBehaviour>();
+        SetUpEasy();
+    }
+
+    protected override void SetUpHard()
+    {
+        SetUpEasy();
+    }
+
+    public override bool IsSuccess()
+    {
         if (cityBehaviour.hasBeenDestroyed)
         {
-            return GameSuccessState.Failure;
+            return false;
         }
 
-        return GameSuccessState.Success;
+        return true;
     }
 }

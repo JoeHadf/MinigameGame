@@ -12,9 +12,10 @@ GameObject:
   - component: {fileID: 1717636539765132254}
   - component: {fileID: 3837923463359142540}
   - component: {fileID: 3829415074249890839}
+  - component: {fileID: 7119196980427358190}
   m_Layer: 0
   m_Name: Square
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -158,3 +159,17 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &7119196980427358190
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4755921334931167379}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0bb45b48822097c479d1e182d32efdca, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  baseColour: {r: 1, g: 1, b: 1, a: 1}
+  hitColour: {r: 0.3207547, g: 0.3207547, b: 0.3207547, a: 1}

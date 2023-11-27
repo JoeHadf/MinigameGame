@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: 7199459181640951858}
   - component: {fileID: 3365890774459199013}
   - component: {fileID: 1438561777560276086}
-  - component: {fileID: 3164087580458274893}
+  - component: {fileID: -3105828455122053620}
   m_Layer: 0
   m_Name: Bucket
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -159,7 +159,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!114 &3164087580458274893
+--- !u!114 &-3105828455122053620
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -168,7 +168,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 8637162874576327635}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 37c0148473518c44581cf0f8c4be53c4, type: 3}
+  m_Script: {fileID: 11500000, guid: c80f1d4d211c3ed4bbdd7eacbde5347f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
+  speed:
+    baseSpeed: 5
+  allowHorizontal: 1
+  allowVertical: 0

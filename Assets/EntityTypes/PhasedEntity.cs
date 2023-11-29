@@ -59,6 +59,11 @@ public class PhasedEntity : MonoBehaviour
         }
     }
 
+    private protected int GetCurrentPhaseIndex()
+    {
+        return currentPhaseIndex;
+    }
+
     private void NextPhase()
     {
         currentPhaseIndex = (currentPhaseIndex + 1) % totalPhaseCount;

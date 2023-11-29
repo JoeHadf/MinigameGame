@@ -45,6 +45,9 @@ public class GameManager
             case GameName.Sudoku:
                 currentGame = new Sudoku();
                 break;
+            case GameName.FlySwat:
+                currentGame = new FlySwat();
+                break;
             case GameName.SpaceGame:
                 currentGame = new SpaceGame();
                 break;

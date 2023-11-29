@@ -47,7 +47,7 @@ public class GameTimer : MonoBehaviour
                 {
                     currentTime -= Time.fixedDeltaTime;
 
-                    if (currentTime < 0)
+                    if (currentTime <= 0)
                     {
                         hasFinished = true;
                     }

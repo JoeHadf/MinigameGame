@@ -17,7 +17,7 @@ public class GameLoop : MonoBehaviour
     private void Awake()
     {
         lifeManager = new LifeManager();
-        timerManager = new TimerManager();
+        timerManager = TimerManager.GetInstance();
         gameManager = new GameManager();
     }
 

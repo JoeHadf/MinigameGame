@@ -16,6 +16,7 @@ public static class GameInformation
         CreateGameData(GameName.SquareTheCircle, GameType.Regular, 7);
         CreateGameData(GameName.CatchTheDroplet, GameType.Regular, 5);
         CreateGameData(GameName.Sudoku, GameType.Regular, 5);
+        CreateGameData(GameName.FlySwat, GameType.Regular, 20);
         
         CreateGameData(GameName.SpaceGame, GameType.Boss, 20);
         CreateGameData(GameName.CityDefense, GameType.Boss, 20);
@@ -63,6 +64,7 @@ public enum GameName
     SquareTheCircle = 1,
     CatchTheDroplet = 2,
     Sudoku = 3,
+    FlySwat = 4,
     SpaceGame = 101,
     CityDefense = 102
 }

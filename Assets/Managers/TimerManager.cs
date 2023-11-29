@@ -4,14 +4,26 @@ using UnityEngine;
 
 public class TimerManager
 {
+    private static TimerManager instance;
+    
     public GameTimer gameTimer;
     public GameState currentState { get; private set; }
 
-    public TimerManager()
+    private TimerManager()
     {
         GameObject timer = new GameObject("Timer");
         gameTimer = timer.AddComponent<GameTimer>();
         currentState = GameState.Null;
+    }
+
+    public static TimerManager GetInstance()
+    {
+        if (instance == null)
+        {
+            instance = new TimerManager();
+        }
+
+        return instance;
     }
 
     public void StartLoop()
@@ -30,6 +42,14 @@ public class TimerManager
         }
 
         currentState = (GameState)nextValue;
+    }
+
+    public void EndGameEarly()
+    {
+        if (currentState == GameState.Game)
+        {
+            gameTimer.SetTimer(0);
+        }
     }
 }
 

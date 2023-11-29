@@ -19,6 +19,11 @@ public class ObjectSpawner : MonoBehaviour
             return instance;
         }
     }
+    
+    public GameObject Spawn(GameObject spawnedObject)
+    {
+        return Instantiate(spawnedObject, Vector3.zero, Quaternion.identity, transform);
+    }
 
     public GameObject Spawn(GameObject spawnedObject, Vector3 position)
     {
